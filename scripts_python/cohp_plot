@@ -1,0 +1,70 @@
+#!/gpfs/share/home/2301112381/.conda/envs/sub_1_cjf/bin/python
+# @Time    : 2025/1/7 19:59
+# @Author  : JunFei Cai
+# @File    : cohp_plot
+import sys
+sys.path.append("/gpfs/share/home/2301112381/github/fei_script-tutorial/scripts_python")
+
+from my_modules.functions import *
+from my_modules.charge_process import *
+import matplotlib.pyplot as plt
+from warnings import simplefilter
+# 忽略FutureiWarning
+simplefilter(action='ignore', category=FutureWarning)
+
+# 全局配置格式
+plot_params = {
+    "font.family": "Arial",
+    "figure.dpi": 300,
+    "savefig.format": 'svg',
+    "xtick.labelsize": 8,
+    "ytick.labelsize": 8,
+    "legend.fontsize": 8,
+    "xtick.direction": "in",
+    "ytick.direction": "in",
+    "axes.labelweight": "bold"
+}
+
+plt.rcParams.update(plot_params)
+
+data_path = "./"
+
+for i in get_sub_path(data_path):
+    structure_path = os.path.join(i, "POSCAR")
+    struct = Structure.from_file(structure_path)
+    title_str = simplify_chemical_formula(struct.formula)  # 用于设定标题
+    print(title_str)
+
+    hybrid_path = os.path.join(i, "hybrid_calculation")
+    pair_path_list = get_sub_path(hybrid_path)
+    x_stick = [i for i in range(-10, 6, 2)]
+
+    n_rows = len(pair_path_list)  # 用来设定子图的列数
+
+    sub_plot_size = (4, 2)  # 这边指定子图的size
+    fig, axs = plt.subplots(nrows=n_rows, ncols=1,
+                           figsize=(sub_plot_size[0], n_rows * sub_plot_size[1]))
+    plt.suptitle(formula_to_latex(title_str), fontsize=10, fontweight='bold')
+
+    for row in range(n_rows):
+        coop_path = pair_path_list[row]
+        coop_pair = os.path.basename(coop_path)  # 作用对的名称
+        cohp_data_path = os.path.join(coop_path, "COBICAR.lobster")
+        print(cohp_data_path)
+        data = cohp_extract(cohp_data_path)
+        parameter_dict = {"xlim": (-10, 6),
+                          "xticks": x_stick,
+                          "curve_label": (coop_pair + "-up", coop_pair + "-down"),
+                          "curve_color": ("red", "blue"),
+                          # "title": title_str,
+                          "xlabel": "Energy $E-E_f$",
+                          "ylabel": "COBI"}
+        plot_cohp(data, ax=axs[row], parameter_dict=parameter_dict, pair_index=1)
+
+    ylim_values = [ax.get_ylim() for ax in axs]
+    max_ylim = max(ylim_values, key=lambda x: max(abs(x[0]), abs(x[1])))
+    for ax in axs:
+        ax.set_ylim(max_ylim)
+    plt.tight_layout()  # 自动调整不让子图重叠
+    svg_name = title_str + "_cobi.svg"
+    plt.savefig(svg_name)
