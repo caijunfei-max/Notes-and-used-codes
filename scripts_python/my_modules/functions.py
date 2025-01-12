@@ -389,13 +389,12 @@ def find_gcd_of_list(numbers):
 
 def simplify_chemical_formula(formula, target_oxygen_count=3, decimal_places=1):
     """
-    由于pymatgen中结构的formula形式比较奇怪，此函数用于简化formula的
-    :param formula: formula形式的字符串
-    :param target_oxygen_count: 简化后氧的数量，默认为3，适用于Li2MnO3
-    :param decimal_places: 设定如果出现小数的话，小数点后的位数，默认一位。
-    :return: 返回简化后的字符串。
+    该函数用于简化化学式，调整元素数量以使得氧元素的数量符合目标数量。
+    :param formula: 化学式字符串
+    :param target_oxygen_count: 目标氧元素数量，默认为3
+    :param decimal_places: 如果出现小数，保留的小数位数，默认为1
+    :return: 返回简化后的化学式
     """
-
     # 去掉空格
     formula = formula.replace(" ", "")
 
@@ -427,12 +426,21 @@ def simplify_chemical_formula(formula, target_oxygen_count=3, decimal_places=1):
             elements[element_match] *= ratio_factor
 
     # 构造简化后的化学式
-    simplified_formula = ''.join(
-        f'{element_match}{quantity:.{decimal_places}f}'
-        if quantity != int(quantity)
-        else f'{element_match}{int(quantity)}'
-        for element_match, quantity in elements.items() if quantity != 1
-    )
+    simplified_formula = ''
+    for element_match, quantity in elements.items():
+        # 如果元素数量接近0，跳过该元素
+        if quantity < 1e-6:
+            continue
+
+        # 如果数量是1，则只显示元素符号
+        if quantity == 1:
+            simplified_formula += f'{element_match}'
+        else:
+            # 格式化数量为整数或保留指定小数位数
+            if quantity != int(quantity):
+                simplified_formula += f'{element_match}{quantity:.{decimal_places}f}'
+            else:
+                simplified_formula += f'{element_match}{int(quantity)}'
 
     return simplified_formula
 
