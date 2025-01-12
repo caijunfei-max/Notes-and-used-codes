@@ -75,7 +75,7 @@ def plot_cohp(cohp_data, ax, parameter_dict,
     plot_data["Y1"] = plot_data.iloc[:, 1]  # * -1  # cohp乘以一个负值
     plot_data["Y2"] = plot_data.iloc[:, 2]  # * -1  # cohp乘以一个负值
     # 获取绝对值最大的数字用于设置纵轴范围
-    max_abs = plot_data[["Y1", "Y2"]].abs().max().max()
+    max_abs = plot_data.iloc[:, 1:3].abs().max().max() * 1.2
 
     # 上自旋曲线
     sns.lineplot(data=plot_data,
@@ -104,4 +104,8 @@ def plot_cohp(cohp_data, ax, parameter_dict,
     ax.set_xlabel(parameter_dict["xlabel"])
     ax.set_ylabel(parameter_dict["ylabel"])
     ax.set_xlim(parameter_dict["xlim"])
-    ax.set_ylim(-math.ceil(max_abs), math.ceil(max_abs))
+    ax.set_ylim(-max_abs, max_abs)
+    # ax.set_ylim(-0.1, 0.1)
+
+
+
