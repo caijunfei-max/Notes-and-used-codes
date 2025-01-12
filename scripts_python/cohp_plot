@@ -2,6 +2,7 @@
 # @Time    : 2025/1/7 19:59
 # @Author  : JunFei Cai
 # @File    : cohp_plot
+# 定义自定义库的位置
 import sys
 sys.path.append("/gpfs/share/home/2301112381/github/fei_script-tutorial/scripts_python")
 

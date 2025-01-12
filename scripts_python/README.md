@@ -11,5 +11,7 @@ unix2dos filename # 把unix格式转化为windows格式
 
 
 
-### 
+### 文件
+
+chop_plot : 在描述符课题中自动绘制布居分析的代码。代码中绘制的是COBI。需要import自定义库my_modules.
 
