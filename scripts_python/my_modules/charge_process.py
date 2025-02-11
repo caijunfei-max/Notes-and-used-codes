@@ -7,6 +7,7 @@
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from my_modules.math_operation import *
 import matplotlib.pyplot as plt
 import math
 
@@ -108,4 +109,22 @@ def plot_cohp(cohp_data, ax, parameter_dict,
     # ax.set_ylim(-0.1, 0.1)
 
 
+def band_center_calculator(energy, density, energy_min, energy_max, precision=3):
+    """
+    根据公式计算带中心的函数——即一定范围内：（能量和态密度乘积对能量的积分）/（态密度对能量的积分）
+    :param energy: 能量numpy数组数据
+    :param density: 态密度numpy数组数据
+    :param energy_min: 设定的最低能量值
+    :param energy_max: 设定的最高能量
+    :param precision: 最后结果的小数位数，默认为3个小数
+    :return: 返回能带中心的能量数值
+    """
 
+    e_density = energy * density
+    e_density_integral = data_integration(energy, e_density, energy_min, energy_max)
+
+    density_integral = data_integration(energy, density, energy_min, energy_max)
+
+    band_center = round(e_density_integral / density_integral, precision)
+
+    return band_center
