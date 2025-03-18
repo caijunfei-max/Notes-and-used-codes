@@ -16,20 +16,7 @@ import itertools
 import numpy as np
 from scipy.integrate import simpson
 from pymatgen.core import Structure
-
-
-def symbol_judge(number):
-    """
-    judge the symbol of number
-    :param number: a number type data
-    :return: True for positive number and False for negative number
-    """
-    if number > 0:
-        return True
-    elif number == 0:
-        return None
-    elif number < 0:
-        return False
+from my_modules.math_operation import *
 
 
 def sum_calc(data: tuple | list) -> float:
@@ -472,3 +459,12 @@ def formula_to_latex(chemical_formula):
 
     # 添加美元符号使其成为 LaTeX 格式
     return f"${latex_string}$"
+
+
+def find_indices_in_range(lst, range_min, range_max):
+    # 根据值的大小来找索引
+    indices = []
+    for index, value in enumerate(lst):
+        if range_min < float(value) < range_max:
+            indices.append(index)
+    return indices

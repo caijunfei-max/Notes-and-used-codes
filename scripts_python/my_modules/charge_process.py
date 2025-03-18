@@ -7,9 +7,9 @@
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from my_modules.math_operation import *
-import matplotlib.pyplot as plt
 import math
+from my_modules.functions import *
+from my_modules.math_operation import *
 
 
 def cohp_extract(path):
@@ -107,6 +107,82 @@ def plot_cohp(cohp_data, ax, parameter_dict,
     ax.set_xlim(parameter_dict["xlim"])
     ax.set_ylim(-max_abs, max_abs)
     # ax.set_ylim(-0.1, 0.1)
+
+
+def density_of_states_extract(path, column_reset=False):
+    """
+    使用vaspkit获得态密度的数据之后，用此函数转化为dataframe数据
+    :param path: 原始文件的位置
+    :param column_reset: 是否要根据数据判断上下自旋
+    :return: 包含数据的dataframe
+    """
+    with open(path, "r") as f:
+        lines = f.readlines()
+    lines = [line.rstrip() for line in lines]  # 去掉每一行数据后面的换行符
+    states_data = []
+    for line in lines:
+        line_data = [x for x in line.split(" ") if x != ""]
+        states_data.append(line_data)
+    initial_title = states_data[0]
+    initial_title.remove("#")
+
+    df_title = ["Energy"]
+
+    df_data = np.array(states_data[1:], dtype=float)
+    spin_judge = [symbol_judge(x) for x in df_data.mean(axis=0)]
+    if column_reset:
+        for i in range(1, len(spin_judge)):
+            if spin_judge[i]:
+                df_title.append(initial_title[i] + "-up")
+            else:
+                df_title.append(initial_title[i] + "-down")
+        states_df = pd.DataFrame(data=df_data, columns=df_title)
+    else:
+        states_df = pd.DataFrame(data=df_data, columns=initial_title)
+
+    return states_df
+
+
+def max_finder(data, index_range):
+    # 在指定位置找到数据中的最大值，用于设置
+    max_abs = data.iloc[index_range[0]: index_range[-1], 1:].abs().max().max()
+    return max_abs
+
+
+def density_of_states_plot(data, energy_range, ax, parameter_dict):
+    """
+    通过density_of_states_extract后，绘制态密度。
+    :param data: 通过density_of_states_extract提取的数据
+    :param energy_range: 用于画图的能量范围
+    :param ax: 画图的坐标轴
+    :param parameter_dict: 画图参数
+    :return: 绘制一个dos图
+    """
+    energy_list = data['Energy'].values
+    index_range = find_indices_in_range(energy_list, energy_range[0], energy_range[-1])
+    max_abs = max_finder(data, index_range)
+    y_column = data.iloc[:, 1:]  # 除了Energy之外的数据列表
+    for column in y_column.columns:
+        sns.lineplot(data=data,
+                     x="Energy",
+                     y=column,
+                     label=column,
+                     linewidth=2.5,
+                     ax=ax
+                     )
+
+    ax.legend(loc="best")
+
+    ax.set_xticks(parameter_dict['xticks'])
+
+    ax.axvline(x=0, color="black", linestyle="--", label="Fermi energy")
+
+    ax.axhline(y=0, color="black", linestyle="--")
+    # ax.set_title(parameter_dict["title"])
+    ax.set_xlabel(parameter_dict["xlabel"])
+    ax.set_ylabel(parameter_dict["ylabel"])
+    ax.set_xlim(parameter_dict["xlim"])
+    ax.set_ylim(-max_abs*1.2, max_abs*1.2)
 
 
 def band_center_calculator(energy, density, energy_min, energy_max, precision=3):

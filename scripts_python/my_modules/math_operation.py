@@ -8,6 +8,20 @@ import numpy as np
 from scipy.integrate import simpson
 
 
+def symbol_judge(number):
+    """
+    judge the symbol of number
+    :param number: a number type data
+    :return: True for positive number and False for negative number
+    """
+    if number > 0:
+        return True
+    elif number == 0:
+        return None
+    elif number < 0:
+        return False
+
+
 def data_integration(x, y, x_min, x_max):
     """
     基于辛普森法则，对给定离散数据进行定积分
