@@ -7,6 +7,7 @@
 """
 
 from pymatgen.core.structure import Structure, Molecule
+from pymatgen.core.surface import Slab
 import numpy as np
 
 
@@ -129,12 +130,22 @@ class CustomizedSlab(Structure):
             self.mark_surface_property()
         return [site for site in self.sites if site.properties["surface_properties"] == "surface"]
 
+    @property
     def subsurface_sites(self):
         if "site_properties" in self.site_properties.keys():
             pass
         else:
             self.mark_surface_property()
         return [site for site in self.sites if site.properties["surface_properties"] == "subsurface"]
+
+    @property
+    def normal(self):
+        """
+        Calculates the surface normal vector of the slab
+        """
+        normal = np.cross(self.lattice.matrix[0], self.lattice.matrix[1])
+        normal /= np.linalg.norm(normal)
+        return normal
 
     def mark_surface_property(self, h=4.0):
         """
@@ -210,3 +221,8 @@ class CustomizedSlab(Structure):
                 properties=site.properties
             )
         return struct
+
+
+
+
+

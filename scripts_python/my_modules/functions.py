@@ -47,7 +47,8 @@ def chemical_symbols_generate(structure, replace_dict):
     作者：蔡俊飞
     :param structure: Atoms object in ase
     :param replace_dict: a dict for replace in the elements in structure
-    :return: a chemical symbols used for the cluster_expansion
+    示例：replace_dict = {"Co": ["Li", "Ni", "Co"]}
+    :return: a chemical symbols used for the cluster_expansion.
     """
     numbers = structure.numbers
     symbols = []

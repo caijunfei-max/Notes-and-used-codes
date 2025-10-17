@@ -25,5 +25,7 @@ import my_modules
 
 ### 文件
 
-chop_plot : 在描述符课题中自动绘制布居分析的代码。代码中绘制的是COBI。需要import自定义库my_modules.
+chop_plot : 在描述符课题中自动绘制布居分析的代码。代码中绘制的是COBI。需要import自定义库my_modules。另外此脚本放入了自己默认的绘图参数，使用时从此脚本自取。
+
+
 
